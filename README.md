@@ -21,7 +21,7 @@ Finally, add the directory to your PYTHONPATH.
 The OpenPIV documentation is readily accessible on the project's webpage at https://openpiv.readthedocs.org. For information on how to use the modules, see the tutorial notebooks below.
 
 ## Tutorials
-- [Basic tutorial](https://github.com/ali-sh-96/openpiv-python-cpu/blob/main/tutorials/openpiv_python_cpu_tutorial.ipynb)
+- [Basic tutorial](https://colab.research.google.com/github/ali-sh-96/openpiv-python-cpu/blob/main/tutorials/openpiv_python_cpu_tutorial.ipynb)
 
 ## Contributors
 
