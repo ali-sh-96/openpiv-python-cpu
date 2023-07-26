@@ -8,9 +8,13 @@ OpenPIV-Python is currently under active development, which means it might conta
 
 ## Installation
 First, install pyFFTW:
-`pip install pyfftw`
+
+    `pip install pyfftw`
+
 Then, clone the repository from GitHub:
-`git clone https://github.com/ali-sh-96/openpiv-python-cpu.git`
+
+    `git clone https://github.com/ali-sh-96/openpiv-python-cpu.git`
+
 Finally, add the directory to your PYTHONPATH.
 
 ## Documentation
