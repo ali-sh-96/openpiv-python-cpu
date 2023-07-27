@@ -1,6 +1,8 @@
 # openpiv-python-cpu
 Algorithms for PIV image processing with CPU.
 
+[![DOI](https://zenodo.org/badge/670884759.svg)](https://zenodo.org/badge/latestdoi/670884759)
+
 This is a version of [openpiv-python](https://github.com/OpenPIV/openpiv-python) for use with CPUs. OpenPIV-Python consists of Python modules for performing particle image velocimetry (PIV) analysis on a set of  image pairs. This implementation adds more flexibility for adjusting the PIV parameters. The cross-correlation is performed using FFTW. Both validation and replacement procedures have been improved, and replacement through spring analogy has been added. Overall, the project aimed at improving performance and accuracy for the CPU-based OpenPIV-Python.
 
 ## Warning
