@@ -1,7 +1,7 @@
 """This module contains CPU validation algorithms."""
 
 import numpy as np
-from scipy.sparse import csr_matrix
+from scipy.sparse import lil_matrix, csr_matrix
 from scipy.sparse.linalg import spsolve
 from .cpu_misc import get_stack, DTYPE_f
 
@@ -324,7 +324,7 @@ class ReplacementCPU:
         i_vals, j_vals = i_vals + self.size, j_vals + self.size
         
         # Create the link matrix.
-        link = np.empty((self.n_vals, self.n_vals), dtype=self.dtype_f)
+        link = lil_matrix((self.n_vals, self.n_vals), dtype=self.dtype_f)
         f = np.zeros(self.f_padded_shape, dtype=self.dtype_f)
         
         # Generate the kernel.
