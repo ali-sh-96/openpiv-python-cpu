@@ -51,7 +51,7 @@ class mp_cpu:
         
         assert isinstance(indices, list) and \
             all(isinstance(item, int) for item in indices) and \
-                all(item > 0 for item in indices), \
+                all(item >= 0 for item in indices), \
                     "{} must be a list of positive {} values.".format("indices", "int")
         
         if self.n_cpus > 1:
