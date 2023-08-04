@@ -6,7 +6,7 @@ Algorithms for PIV image processing with CPU.
 This is a version of [openpiv-python](https://github.com/OpenPIV/openpiv-python) for use with CPUs. OpenPIV-Python consists of Python modules for performing particle image velocimetry (PIV) analysis on a set of  image pairs. This implementation adds more flexibility for adjusting the PIV parameters. The cross-correlation is performed using FFTW. Both validation and replacement procedures have been improved, and replacement through spring analogy has been added. Overall, the project aimed at improving performance and accuracy for the CPU-based OpenPIV-Python.
 
 ## Warning
-OpenPIV-Python is currently under active development, which means it might contain some bugs, and its API is subject to change. The algorithms have been tested on the Windows platform only.
+OpenPIV-Python is currently under active development, which means it might contain some bugs, and its API is subject to change. The algorithms have been tested on both Windows (work station and laptops) and Linux (Niagara supercomputing cluster) platforms.
 
 ## Installation
 First, install pyFFTW:
@@ -24,9 +24,9 @@ The OpenPIV documentation is readily accessible on the project's webpage at http
 
 ## Tutorials
 - [Basic tutorial](https://colab.research.google.com/github/ali-sh-96/openpiv-python-cpu/blob/main/tutorials/openpiv_python_cpu_tutorial.ipynb)
+- [Advanced tutorial](https://colab.research.google.com/github/ali-sh-96/openpiv-python-cpu/blob/main/tutorials/openpiv_python_cpu_advanced_tutorial.ipynb)
 
 ## Contributors
-
 1. [OpenPIV team](https://groups.google.com/forum/#!forum/openpiv-users)
 2. [Alex Liberzon](https://github.com/alexlib)
 3. [Ali Shirinzad](https://github.com/ali-sh-96)
