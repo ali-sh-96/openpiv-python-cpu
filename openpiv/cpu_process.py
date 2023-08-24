@@ -54,6 +54,8 @@ class piv_cpu:
     field_mask : ndarray
         2D boolean array of masked locations for the last iteration.
     val_locations : ndarray
+        2D boolean array containing locations of vectors replaced during the last iteration.
+    outliers : ndarray
         2D boolean array containing locations of spurious vectors for the last iteration.
     
     """
@@ -326,6 +328,13 @@ class piv_cpu:
     
     @property
     def val_locations(self):
+        if self.cpu_process.init_val_locations is not None:
+            return self.cpu_process.init_val_locations
+        else:
+            return np.full(self.cpu_process.piv_fields[-1].field_shape, fill_value=False, dtype=bool)
+    
+    @property
+    def outliers(self):
         if self.cpu_process.val_locations is not None:
             return self.cpu_process.val_locations
         else:
@@ -526,6 +535,7 @@ class PIVCPU:
         self.piv_fields = None
         self.corr = None
         self.validation = None
+        self.init_val_locations = self.val_locations = None
         self.replacement = None
         self.init_piv_fields()
     
@@ -553,14 +563,14 @@ class PIVCPU:
         frame_a, frame_b = self.mask_frames(frame_a, frame_b, self.mask)
         
         # Initialize settings generators.
-        max_iters = sum(self.ss_iters)
+        self.max_iters = sum(self.ss_iters)
         self.corr_settings = self.get_corr_settings()
         self.val_settings = self.get_val_settings()
         self.replace_settings = self.get_replace_settings()
         self.smooth_settings = self.get_smooth_settings()
         
         # Main loop.
-        for k in range(max_iters):
+        for k in range(self.max_iters):
             self.k = k
             
             # Get correlation settings.
@@ -601,7 +611,7 @@ class PIVCPU:
             u, v = self.validate_fields(u, v)
             
             # Do not smooth fields for the last iteration.
-            if self.k != max_iters - 1:
+            if self.k != self.max_iters - 1:
                 u, v = self.smooth_fields(u, v)
         
         # Scale fields if scaling parameters are not 1.
@@ -708,7 +718,6 @@ class PIVCPU:
     
     def validate_fields(self, u, v):
         """Returns validated velocity fields with outliers replaced."""
-        self.val_locations = None
         
         # Get validation settings.
         (validation_size,
@@ -734,6 +743,8 @@ class PIVCPU:
         
         # Get initial validation locations.
         self.val_locations = self.validation(u, v, mask=self.piv_fields[self.k].field_mask)
+        if self.k == self.max_iters - 1:
+            self.init_val_locations = self.val_locations
         
         # Get replacement settings.
         (num_iters,
@@ -743,6 +754,10 @@ class PIVCPU:
         
         # Replace outliers.
         u, v = self.replace_outliers(u, v, num_iters=num_iters, method=replacing_method, size=replacing_size, revalidate=is_revalidated)
+        
+        # Get locations of remaining outliers.
+        if self.k == self.max_iters - 1:
+            self.val_locations = self.validation(u, v, mask=self.piv_fields[self.k].field_mask)
         
         return u, v
     

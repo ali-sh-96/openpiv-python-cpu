@@ -305,6 +305,11 @@ class ReplacementCPU:
         if self.method == "mean":
             f = self.mean_replacement()
         
+        # Check for unresolved replacements.
+        if self.method == "median" or self.method == "mean":
+            is_nan = np.logical_or.reduce([np.isnan(f[k]) for k in range(self.num_fields)])
+            f = [np.where(is_nan, self.f[k][self.val_locations], f[k]) for k in range(self.num_fields)]
+        
         self.f_replaced = self.f
         for k in range(self.num_fields):
             self.f_replaced[k][self.val_locations] = f[k]
