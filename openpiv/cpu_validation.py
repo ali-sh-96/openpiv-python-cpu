@@ -272,8 +272,11 @@ class ReplacementCPU:
             # Mask to exclude center of kernel.
             self.kernel_mask = np.full((self.kernel_size, self.kernel_size), fill_value=False, dtype=bool)
             self.kernel_mask[self.size, self.size] = True
+        
+        # Initial fields.
+        self.init_f = None
     
-    def __call__(self, *f, val_locations, n_vals):
+    def __call__(self, *f, val_locations, n_vals, fill_value=None):
         """Returns an array with the replaced vectors.
         
         Parameters
@@ -293,8 +296,10 @@ class ReplacementCPU:
         """
         self.f = f
         self.num_fields = len(self.f)
+        self.init_f = [self.f[k].copy() for k in range(self.num_fields)] if self.init_f is None else self.init_f
         self.val_locations = val_locations
         self.n_vals = n_vals
+        self.fill_value = 0 if self.method == "spring" else fill_value
         self._mask = self.val_locations.reshape(-1)
         
         # Do the replacement.
@@ -305,16 +310,10 @@ class ReplacementCPU:
         if self.method == "mean":
             f = self.mean_replacement()
         
-        # Check for unresolved replacements.
-        if self.method == "median" or self.method == "mean":
-            is_nan = np.logical_or.reduce([np.isnan(f[k]) for k in range(self.num_fields)])
-            f = [np.where(is_nan, self.f[k][self.val_locations], f[k]) for k in range(self.num_fields)]
-        
-        self.f_replaced = self.f
         for k in range(self.num_fields):
-            self.f_replaced[k][self.val_locations] = f[k]
+            self.f[k][self.val_locations] = f[k]
         
-        return self.f_replaced
+        return self.f
     
     def spring_replacement(self):
         """Performs spring replacement on each field by linking all spurious vectors."""
@@ -322,7 +321,7 @@ class ReplacementCPU:
         coef = self.get_coef()
         
         # Right-hand side of spring system.
-        rhs = self.get_stats(method="mean", fill_value=0)
+        rhs = self.get_stats(method="mean", fill_value=self.fill_value)
         
         # Indices of validation locations in padded fields.
         i_vals, j_vals = np.where(self.val_locations)
@@ -379,7 +378,8 @@ class ReplacementCPU:
         else:
             mf = np.nanmean
         
-        f = [np.where(self.val_locations, fill_value, self.f[k]) for k in range(self.num_fields)]
+        f = [np.where(self.val_locations, fill_value, self.f[k]) for k in range(self.num_fields)] \
+            if self.fill_value is not None else self.f
         f = [self.stack_kernels(f[k]) for k in range(self.num_fields)]
         f = [np.where(self.kernel_mask, np.nan, f[k]) for k in range(self.num_fields)]
         return [mf(f[k], axis=(1, 2)) for k in range(self.num_fields)]
@@ -390,3 +390,15 @@ class ReplacementCPU:
         f = get_stack(f, array_shape=self.f_padded_shape, window_size=self.kernel_size, spacing=1)
         f = f[self._mask]
         return f
+    
+    def reset(self, *f, val_locations):
+        f = [np.where(val_locations, self.init_f[k], f[k]) for k in range(self.num_fields)]
+        
+        if self.num_fields == 1:
+            return f[0]
+        else:
+            return f
+    
+    @property
+    def unresolved(self):
+        return np.logical_and(np.logical_or.reduce([np.isnan(self.f[k]) for k in range(self.num_fields)]), self.val_locations)

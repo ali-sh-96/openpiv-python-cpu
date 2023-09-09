@@ -772,9 +772,12 @@ class PIVCPU:
         f_shape = self.piv_fields[self.k].field_shape
         self.replacement = ReplacementCPU(f_shape, method=method, size=size, dtype_f=self.dtype_f)
         
+        # Exclude spurious vectors for the first replacement iteration.
+        fill_value = np.nan
+        
         for i in range(num_iters):
             # Replace vectors at validation locations.
-            u, v = self.replacement(u, v, val_locations=self.val_locations, n_vals=n_vals)
+            u, v = self.replacement(u, v, val_locations=self.val_locations, n_vals=n_vals, fill_value=fill_value)
             
             # Update validation locations if required.
             if revalidate:
@@ -784,11 +787,22 @@ class PIVCPU:
                 else:
                     mask = ~self.val_locations
                 
-                # Update number of outliers.
-                self.val_locations = self.validation(u, v, mask=mask)
-                n_vals = np.count_nonzero(self.val_locations)
-                if n_vals == 0:
-                    break
+                # Reset unresolved replacements for next iteration.
+                is_nan = self.replacement.unresolved
+                u, v = self.replacement.reset(u, v, val_locations=is_nan)
+                
+                # Update the location of outliers.
+                self.val_locations = np.logical_or(self.validation(u, v, mask=mask), is_nan)
+                if method == "spring":
+                    n_vals = np.count_nonzero(self.val_locations)
+            else:
+                # Allow all neighbors to be used for remaining iterations.
+                fill_value = None
+        
+        # Reset unresolved replacements if number of iterations is not enough.
+        if not revalidate:
+            is_nan = self.replacement.unresolved
+            u, v = self.replacement.reset(u, v, val_locations=is_nan)
         
         return u, v
     
