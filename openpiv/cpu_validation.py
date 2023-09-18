@@ -249,6 +249,11 @@ class ReplacementCPU:
     dtype_f : str, optional
         Float data type.
     
+    Attributes
+    ----------
+    unresolved : ndarray
+        2D boolean array containing locations of unsuccessful replacements.
+    
     """
     def __init__(self, f_shape, method=REPLACING_METHOD, size=REPLACING_SIZE, dtype_f=DTYPE_f):
         self.f_shape = f_shape
@@ -392,6 +397,7 @@ class ReplacementCPU:
         return f
     
     def reset(self, *f, val_locations):
+        """Resets unsuccessful replacements to their original value."""
         f = [np.where(val_locations, self.init_f[k], f[k]) for k in range(self.num_fields)]
         
         if self.num_fields == 1:
