@@ -1,4 +1,4 @@
-"""This module contains multiprocessing algorithms."""
+"""This module contains multiprocessing algorithms for a CPU."""
 
 import inspect
 from multiprocessing import Pool
@@ -11,7 +11,7 @@ class mp_cpu:
     func : function
         Function that is multiprocessed.
     n_cpus : int
-        Number of available CPUs.
+        Number of processes.
     
     """
     
