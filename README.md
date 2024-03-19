@@ -11,7 +11,7 @@ OpenPIV-Python is currently under active development, which means it might conta
 ## Installation
 Use the following command to install from GitHub:
 
-    pip install git + https://github.com/ali-sh-96/openpiv-python-cpu
+    pip install git+https://github.com/ali-sh-96/openpiv-python-cpu
 
 ## Documentation
 The OpenPIV documentation is readily accessible on the project's webpage at https://openpiv.readthedocs.org. For information on how to use the modules, see the tutorial notebooks below.
