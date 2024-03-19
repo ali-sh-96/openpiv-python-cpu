@@ -9,7 +9,7 @@ This is a version of [openpiv-python](https://github.com/OpenPIV/openpiv-python)
 OpenPIV-Python is currently under active development, which means it might contain some bugs, and its API is subject to change. The algorithms have been tested on both Windows (work station and laptops) and Linux (Niagara supercomputing cluster) platforms.
 
 ## Installation
-Use the following command to install from GitHub:
+use the following command to install from GitHub:
 
     pip install git+https://github.com/ali-sh-96/openpiv-python-cpu
 
@@ -17,8 +17,8 @@ Use the following command to install from GitHub:
 The OpenPIV documentation is readily accessible on the project's webpage at https://openpiv.readthedocs.org. For information on how to use the modules, see the tutorial notebooks below.
 
 ## Tutorials
-- [Basic tutorial](https://colab.research.google.com/github/ali-sh-96/openpiv-python-cpu/blob/main/tutorials/openpiv_python_cpu_tutorial.ipynb)
-- [Advanced tutorial](https://colab.research.google.com/github/ali-sh-96/openpiv-python-cpu/blob/main/tutorials/openpiv_python_cpu_advanced_tutorial.ipynb)
+- [Basic tutorial](https://colab.research.google.com/github/ali-sh-96/openpiv-python-cpu/blob/main/openpiv_cpu/tutorials/openpiv_python_cpu_tutorial.ipynb)
+- [Advanced tutorial](https://colab.research.google.com/github/ali-sh-96/openpiv-python-cpu/blob/main/openpiv_cpu/tutorials/openpiv_python_cpu_advanced_tutorial.ipynb)
 
 ## Contributors
 1. [OpenPIV team](https://groups.google.com/forum/#!forum/openpiv-users)

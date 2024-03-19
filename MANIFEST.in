@@ -7,3 +7,4 @@ recursive-exclude openpiv_cpu/__pycache__ *
 recursive-include openpiv_cpu *.ipynb
 recursive-include openpiv_cpu *.py
 recursive-include openpiv_cpu *.tif
+recursive-include openpiv_cpu *.png
