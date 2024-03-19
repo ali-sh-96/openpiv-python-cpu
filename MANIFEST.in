@@ -1,0 +1,9 @@
+include *.md
+include LICENSE.txt
+
+recursive-include openpiv_cpu/tutorials *
+recursive-exclude openpiv_cpu/__pycache__ *
+
+recursive-include openpiv_cpu *.ipynb
+recursive-include openpiv_cpu *.py
+recursive-include openpiv_cpu *.tif
