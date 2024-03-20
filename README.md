@@ -1,4 +1,4 @@
-# Openpiv-Python-CPU
+# OpenPIV-Python-CPU
 Algorithms for PIV image processing with a CPU.
 
 [![DOI](https://zenodo.org/badge/670884759.svg)](https://zenodo.org/badge/latestdoi/670884759)
