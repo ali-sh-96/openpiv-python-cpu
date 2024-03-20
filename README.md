@@ -3,7 +3,10 @@ Algorithms for PIV image processing with a CPU.
 
 [![DOI](https://zenodo.org/badge/670884759.svg)](https://zenodo.org/badge/latestdoi/670884759)
 
-[OpenPIV-Python-CPU](https://github.com/ali-sh-96/openpiv-python-cpu) and [OpenPIV-Python-GPU](https://github.com/ali-sh-96/openpiv-python-gpu) are versions of [openpiv-python](https://github.com/OpenPIV/openpiv-python) optimized for use with a central processing unit (CPU) or a graphics processing units (GPU), respectively. OpenPIV-Python consists of Python modules for performing particle image velocimetry (PIV) analysis on a set of  image pairs. This implementation adds more flexibility for adjusting the PIV parameters. For the CPU-based module, The cross-correlation is performed using the fastest Fourier transform in the west (pyFFTW), while the frame deformation is accelerated by Numba. Both validation and replacement procedures have been improved, and replacement through spring analogy has been added. Overall, the project aimed at improving the performance and accuracy for CPU- and GPU-based PIV analysis.
+[OpenPIV-Python-CPU](https://github.com/ali-sh-96/openpiv-python-cpu) is a version of [openpiv-python](https://github.com/OpenPIV/openpiv-python) optimized for use with a central processing unit (CPU). OpenPIV-Python consists of Python modules for performing particle image velocimetry (PIV) analysis on a set of  image pairs. This implementations add more flexibility for adjusting the PIV parameters. The cross-correlation is performed using the fastest Fourier transform in the west (pyFFTW), while the frame deformation is accelerated by Numba. Both validation and replacement procedures have been improved, and replacement through spring analogy has been added. Overall, this project aimed at improving the performance and accuracy for CPU-based PIV analysis.
+
+## Related projects
+An alternative implementation of the same algorithms for use with a graphics processing unit (GPU) is available as [OpenPIV-Python-GPU](https://github.com/ali-sh-96/openpiv-python-gpu).
 
 ## Warning
 OpenPIV-Python is currently under active development, which means it might contain some bugs, and its API is subject to change. This module has been tested on both Windows (work station and laptops) and Linux (Niagara supercomputing cluster) platforms.
@@ -33,5 +36,4 @@ releasing their work as an open source. OpenPIV license does not relate to this 
 authors regarding their license.
 
 ## How to cite this work
-
 Shirinzad, A., Jaber, K., Xu, K., & Sullivan, P. E. (2023). An Enhanced Python-Based Open-Source Particle Image Velocimetry Software for Use with Central Processing Units. Fluids, 8(11), 285. https://doi.org/10.3390/fluids8110285
