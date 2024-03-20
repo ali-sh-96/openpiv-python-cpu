@@ -9,7 +9,7 @@ This is a version of [openpiv-python](https://github.com/OpenPIV/openpiv-python)
 OpenPIV-Python is currently under active development, which means it might contain some bugs, and its API is subject to change. The algorithms have been tested on both Windows (work station and laptops) and Linux (Niagara supercomputing cluster) platforms.
 
 ## Installation
-use the following command to install from GitHub:
+Use the following command to install from GitHub:
 
     pip install git+https://github.com/ali-sh-96/openpiv-python-cpu
 
@@ -24,7 +24,7 @@ The OpenPIV documentation is readily accessible on the project's webpage at http
 1. [OpenPIV team](https://groups.google.com/forum/#!forum/openpiv-users)
 2. [Alex Liberzon](https://github.com/alexlib)
 3. [Ali Shirinzad](https://github.com/ali-sh-96)
-4. [Pierre E. Sullivan]
+4. Pierre E. Sullivan
 
 Copyright statement: `cpu_smoothn.py` is a Python version of `smoothn.m` originally created by
 [D. Garcia](https://de.mathworks.com/matlabcentral/fileexchange/25634-smoothn), written by Prof. Lewis, and available on
