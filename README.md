@@ -9,7 +9,7 @@ Algorithms for PIV image processing with a CPU.
 An alternative implementation of the same algorithms for use with a graphics processing unit (GPU) is available as [openpiv-python-gpu](https://github.com/ali-sh-96/openpiv-python-gpu).
 
 ## Warning
-OpenPIV-Python is currently under active development, which means it might contain some bugs, and its API is subject to change. This module has been tested on both Windows (work station and laptops) and Linux (Niagara supercomputing cluster) platforms.
+OpenPIV-Python is currently under active development, which means it might contain some bugs, and its API is subject to change. This module has been tested on both Windows (work station and laptops) and Linux (Niagara supercomputing cluster and Google Colab) platforms.
 
 ## Installation
 Use the following command to install from GitHub:
