@@ -21,6 +21,7 @@ The OpenPIV documentation is readily accessible on the project's webpage at http
 
 ## Tutorials
 - [Basic tutorial](https://colab.research.google.com/github/ali-sh-96/openpiv-python-cpu/blob/main/openpiv_cpu/tutorials/openpiv_python_cpu_tutorial.ipynb)
+- [Stitching tutorial](https://colab.research.google.com/github/ali-sh-96/openpiv-python-cpu/blob/main/openpiv_cpu/tutorials/openpiv_python_cpu_stitching_tutorial.ipynb)
 - [Masking tutorial](https://colab.research.google.com/github/ali-sh-96/openpiv-python-cpu/blob/main/openpiv_cpu/tutorials/openpiv_python_cpu_masking_tutorial.ipynb)
 - [Advanced tutorial](https://colab.research.google.com/github/ali-sh-96/openpiv-python-cpu/blob/main/openpiv_cpu/tutorials/openpiv_python_cpu_advanced_tutorial.ipynb)
 
