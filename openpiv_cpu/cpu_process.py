@@ -381,7 +381,7 @@ class PIVCPU:
     
     Parameters
     ----------
-    frame_shape : ndarray or tuple
+    frame_shape : tuple
         Shape of the images in pixels.
     min_search_size : int
         Length of the sides of the square search window. Only supports multiples of 8 and powers of 2.
