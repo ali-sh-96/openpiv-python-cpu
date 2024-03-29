@@ -50,6 +50,8 @@ class piv_cpu:
     
     Attributes
     ----------
+    field_shape : tuple
+        Shape of the resulting velocity fields.
     coords : tuple
         A tuple of 2D arrays, (x, y) coordinates, where the velocity field is computed.
     field_mask : ndarray
@@ -314,6 +316,11 @@ class piv_cpu:
                         "Both frames must be an ndarray of {} values with shape {}.".format("real", self.frame_shape)
         
         return self.cpu_process(frame_a, frame_b)
+    
+    @property
+    def field_shape(self):
+        "Returns the field shape."
+        return self.cpu_process.piv_fields[-1].field_shape
     
     @property
     def coords(self):
