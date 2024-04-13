@@ -126,6 +126,13 @@ class StitchCPU:
         self.overlap = overlap
         self.y_offset = y_offset if y_offset >= 0 else -y_offset
         self.is_reversed = False if y_offset >= 0 else True
+        
+        # Swap the frame widths if y_offset is negative.
+        if self.is_reversed:
+            wd_t = self.wd_a
+            self.wd_a = self.wd_b
+            self.wd_b = wd_t
+        
         self.x_offset = self.wd_a - self.overlap
         self.frame_shape = (self.ht_a + self.y_offset, self.wd_a + self.wd_b - self.overlap)
         
@@ -138,7 +145,6 @@ class StitchCPU:
             self.dtype_u = np.uint64
         else:
             self.dtype_u = DTYPE_u
-                
         
         # Initialize the temporary arrays.
         self.zl = np.zeros((self.y_offset, self.x_offset))
