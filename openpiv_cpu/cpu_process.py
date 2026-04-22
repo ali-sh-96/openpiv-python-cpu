@@ -1303,7 +1303,7 @@ class CorrelationCPU:
         sig2noise = np.where(corr_peak1 > 0, corr_peak1 / corr_peak2, sig2noise)
         
         # Set to inf if second peak is zero or negative and first peak is positive.
-        sig2noise = np.where(np.logical_and(corr_peak2 <= 0, corr_peak1 > 0), np.Inf, sig2noise)
+        sig2noise = np.where(np.logical_and(corr_peak2 <= 0, corr_peak1 > 0), np.inf, sig2noise)
         
         if self._field_mask is not None:
             # sig2noise is zero by default inside the mask.
