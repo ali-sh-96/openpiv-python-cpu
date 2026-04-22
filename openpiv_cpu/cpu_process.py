@@ -22,6 +22,7 @@ OVERLAP_RATIO = 0.5
 SHRINK_RATIO = 1
 DEFORMING_ORDER = 1
 NORMALIZE = True
+MASK_ZERO = False
 SUBPIXEL_METHOD = "gaussian"
 N_FFT = 2
 DEFORMING_PAR = 0.5
@@ -68,6 +69,7 @@ class piv_cpu:
         shrink_ratio = kwargs["shrink_ratio"] if "shrink_ratio" in kwargs else SHRINK_RATIO
         deforming_order = kwargs["deforming_order"] if "deforming_order" in kwargs else DEFORMING_ORDER
         normalize = kwargs["normalize"] if "normalize" in kwargs else NORMALIZE
+        mask_zero = kwargs["mask_zero"] if "mask_zero" in kwargs else MASK_ZERO
         subpixel_method = kwargs["subpixel_method"] if "subpixel_method" in kwargs else SUBPIXEL_METHOD
         n_fft = kwargs["n_fft"] if "n_fft" in kwargs else N_FFT
         deforming_par = kwargs["deforming_par"] if "deforming_par" in kwargs else DEFORMING_PAR
@@ -141,6 +143,9 @@ class piv_cpu:
             len(self.normalize) >= self.num_passes and \
                 all(isinstance(item, bool) for item in self.normalize), \
                     "{} must be a tuple of {} values, defined for all passes.".format("normalize", "bool")
+        
+        self.mask_zero = mask_zero
+        assert isinstance(self.mask_zero, bool), "{} must have a {} value.".format("mask_zero", "bool")
         
         self.subpixel_method = (subpixel_method,) * self.num_passes if isinstance(subpixel_method, str) else subpixel_method
         assert isinstance(self.subpixel_method, tuple) and \
@@ -403,6 +408,8 @@ class PIVCPU:
         Order of the spline interpolation used for window deformation.
     normalize : bool or tuple, optional
         Whether to normalize the window intensity by subtracting the mean intensity.
+    mask_zero: bool, optional
+        Whether to mask the center of the cross-correlation map.
     subpixel_method : {"gaussian", "centroid", "parabolic"} or tuple, optional
         Method to estimate the subpixel location of the peak at each iteration.
     n_fft : int or tuple, optional
@@ -469,6 +476,7 @@ class PIVCPU:
                  shrink_ratio=SHRINK_RATIO,
                  deforming_order=DEFORMING_ORDER,
                  normalize=NORMALIZE,
+                 mask_zero=MASK_ZERO,
                  subpixel_method=SUBPIXEL_METHOD,
                  n_fft=N_FFT,
                  deforming_par=DEFORMING_PAR,
@@ -504,6 +512,7 @@ class PIVCPU:
         # Correlation settings.
         self.deforming_order = (deforming_order,) * self.n_passes if isinstance(deforming_order, int) else deforming_order
         self.is_normalized = (normalize,) * self.n_passes if isinstance(normalize, bool) else normalize
+        self.is_masked = (mask_zero,) * self.n_passes
         self.subpixel_method = (subpixel_method,) * self.n_passes if isinstance(subpixel_method, str) else subpixel_method
         self.n_fft = (n_fft,) * self.n_passes if isinstance(n_fft, int) else n_fft
         self.deforming_par = (deforming_par,) * self.n_passes if deforming_par == 0 or deforming_par == 1 or \
@@ -593,6 +602,7 @@ class PIVCPU:
             # Get the correlation settings.
             (deforming_order,
              is_normalized,
+             is_masked,
              subpixel_method,
              n_fft,
              deforming_par,
@@ -604,6 +614,7 @@ class PIVCPU:
             self.corr = CorrelationCPU(frame_a, frame_b,
                                        deforming_order=deforming_order,
                                        normalize=is_normalized,
+                                       mask_zero=is_masked,
                                        subpixel_method=subpixel_method,
                                        s2n_method=s2n_method,
                                        s2n_size=s2n_size,
@@ -685,6 +696,7 @@ class PIVCPU:
             for _ in range(ss):
                 yield (self.deforming_order[i],
                        self.is_normalized[i],
+                       self.is_masked[i],
                        self.subpixel_method[i],
                        self.n_fft[i],
                        self.deforming_par[i],
@@ -949,6 +961,8 @@ class CorrelationCPU:
         Order of spline interpolation used for window deformation.
     normalize : bool, optional
         Whether to normalize the window intensity by subtracting the mean intensity.
+    mask_zero: bool, optional
+        Whether to mask the center of the cross-correlation map.
     subpixel_method : {"gaussian", "centroid", "parabolic"}, optional
         Method to approximate the subpixel location of the peaks.
     s2n_method : {"peak2peak", "peak2mean", "peak2energy"}, optional
@@ -968,6 +982,7 @@ class CorrelationCPU:
     def __init__(self, frame_a, frame_b,
                  deforming_order=DEFORMING_ORDER,
                  normalize=NORMALIZE,
+                 mask_zero=MASK_ZERO,
                  subpixel_method=SUBPIXEL_METHOD,
                  s2n_method=S2N_METHOD,
                  s2n_size=S2N_SIZE,
@@ -977,6 +992,7 @@ class CorrelationCPU:
         self.frame_b = frame_b
         self.deforming_order = deforming_order
         self.is_normalized = normalize
+        self.is_masked = mask_zero
         self.subpixel_method = subpixel_method
         
         # A small value is added to the denominator for subpixel approximation.
@@ -1056,6 +1072,12 @@ class CorrelationCPU:
         
         # Correlate the windows.
         self.corr = self.correlate_windows(win_a, win_b)
+        
+        # Mask the center of the cross-correlation map.
+        if self.is_masked:
+            ic, jc = self.fft_ht // 2, self.fft_wd // 2
+            width = 0
+            self.corr[:, ic - width: ic + width + 1, jc - width: jc + width + 1] = np.NINF
         
         # Get the first peak locations of the cross-correlation map.
         self.i_peak1, self.j_peak1 = self.get_first_peak(self.corr)

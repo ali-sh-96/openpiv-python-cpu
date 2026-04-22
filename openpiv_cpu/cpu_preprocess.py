@@ -2,6 +2,7 @@
 
 import numpy as np
 from . import DTYPE_u
+DTYPE_f = np.float32
 
 # Default settings.
 OVERLAP = 1
@@ -11,7 +12,7 @@ Y_OFFSET = 0
 ALLOWED_DATA_TYPES = {"uint8", "uint16", "uint32", "uint64"}
 
 class stitch_cpu:
-    """Wrapper-class for StitchCPU that further applies input validation and provides user inetrface.
+    """Wrapper-class for Stitchcpu that further applies input validation and provides user inetrface.
     
     Parameters
     ----------
@@ -20,7 +21,7 @@ class stitch_cpu:
     frame_b_shape : tuple
         Shape of the right image in pixels.
     **kwargs
-        Stitching settings. See StitchCPU.
+        Stitching settings. See Stitchcpu.
     
     Attributes
     ----------
@@ -55,12 +56,10 @@ class stitch_cpu:
                             .format("frame_b_shape", "int", "overlap", self.overlap)
         
         ht_a, ht_b = self.frame_a_shape[0], self.frame_b_shape[0]
-        assert ht_a == ht_b, "Both frames must have the same height."
-        
         self.y_offset = y_offset
         assert isinstance(self.y_offset, int) and \
-            self.y_offset >= -ht_b and self.y_offset <= ht_b\
-                , "{} must be an {} number less than {}.".format("y_offset", "int", ht_a)
+            self.y_offset >= -ht_a and self.y_offset <= ht_b\
+                , "{} must be an {} number between {} and {}.".format("y_offset", "int", -ht_a, ht_b)
         
         self.dtype_u = dtype_u
         assert isinstance(self.dtype_u, str) and \
@@ -70,7 +69,7 @@ class stitch_cpu:
         self.cpu_stitch = StitchCPU(frame_a_shape, frame_b_shape, **kwargs)
         
     def __call__(self, frame_a, frame_b):
-        """Computes velocity field from an image pair.
+        """Stitches two arbitrary frames.
         
         Parameters
         ----------
@@ -80,7 +79,7 @@ class stitch_cpu:
         Returns
         -------
         frame_stitched : ndarray
-            2D array containing grey levels of the stitched frame.
+            CuPy 2D array containing grey levels of the stitched frame.
         
         """
         assert isinstance(frame_a, np.ndarray) and \
@@ -103,7 +102,7 @@ class stitch_cpu:
         return self.cpu_stitch.frame_shape
 
 class StitchCPU:
-    """Stitches two frames of the same height by linearly merging the intensity values in the overlapping region.
+    """Stitches two frames by linearly merging the intensity values in the overlapping region.
     
     Parameters
     ----------
@@ -127,16 +126,24 @@ class StitchCPU:
         self.y_offset = y_offset if y_offset >= 0 else -y_offset
         self.is_reversed = False if y_offset >= 0 else True
         
-        # Swap the frame widths if y_offset is negative.
+        # Swap the frame dimensions if y_offset is negative.
         if self.is_reversed:
             wd_t = self.wd_a
             self.wd_a = self.wd_b
             self.wd_b = wd_t
+            
+            ht_t = self.ht_a
+            self.ht_a = self.ht_b
+            self.ht_b = ht_t
         
+        self.case_a = self.ht_b <= self.ht_a + self.y_offset
+        self.case_b = self.ht_b > self.ht_a + self.y_offset
+        ht_t = self.ht_b if self.case_b else self.ht_a + self.y_offset
         self.x_offset = self.wd_a - self.overlap
-        self.frame_shape = (self.ht_a + self.y_offset, self.wd_a + self.wd_b - self.overlap)
+        self.frame_shape = (ht_t, self.wd_a + self.wd_b - self.overlap)
         
         # Data type settings.
+        self.dtype_f = DTYPE_f
         if dtype_u == "uint8":
             self.dtype_u = np.uint8
         elif dtype_u == "uint32":
@@ -147,12 +154,17 @@ class StitchCPU:
             self.dtype_u = DTYPE_u
         
         # Initialize the temporary arrays.
-        self.zl = np.zeros((self.y_offset, self.x_offset))
-        self.zr = np.zeros((self.y_offset, self.wd_b - self.overlap))
-        self.fm = np.tile(np.linspace(1, 0, self.overlap), (self.ht_a - self.y_offset, 1))
-    
+        self.zu = np.zeros((self.y_offset, self.x_offset), dtype=self.dtype_u)
+        ht_t = self.ht_a + self.y_offset - self.ht_b
+        if self.case_a:
+            self.zd = np.zeros((ht_t, self.wd_b - self.overlap), dtype=self.dtype_u)
+            self.fm = np.tile(np.linspace(1, 0, self.overlap, dtype=self.dtype_f), (self.ht_b - self.y_offset, 1))
+        else:
+            self.zd = np.zeros((-ht_t, self.x_offset), dtype=self.dtype_u)
+            self.fm = np.tile(np.linspace(1, 0, self.overlap, dtype=self.dtype_f), (self.ht_a, 1))
+        
     def __call__(self, frame_a, frame_b):
-        """Performs the stitching for two frames of the same height.
+        """Performs the stitching for two frames.
         
         Parameters
         ----------
@@ -162,27 +174,47 @@ class StitchCPU:
         Returns
         -------
         frame_stitched : ndarray
-            2D array containing grey levels of the stitched frame.
+            CuPy 2D array containing grey levels of the stitched frame.
         
         """
+        # Send frames to cpu.
+        frame_a = np.asarray(frame_a)
+        frame_b = np.asarray(frame_b)
+        
         # Swap the frames if y_offset is negative.
+        frame_a, frame_b = frame_a.astype(self.dtype_u), frame_b.astype(self.dtype_u)
         if self.is_reversed:
             frame_t = frame_a
             frame_a = frame_b[:, ::-1]
             frame_b = frame_t[:, ::-1]
         
         # Slice the left and right frames.
-        fl = np.concatenate((self.zl, frame_a[:, :self.x_offset]), axis=0)
-        fr = np.concatenate((frame_b[:, self.overlap:], self.zr), axis=0)
+        if self.case_a:
+            fl = np.concatenate((self.zu, frame_a[:, :self.x_offset]), axis=0)
+            fr = np.concatenate((frame_b[:, self.overlap:], self.zd), axis=0)
+        else:
+            fl = np.concatenate((self.zu, frame_a[:, :self.x_offset], self.zd), axis=0)
+            fr = frame_b[:, self.overlap:]
         
         # Merge the overlapping values linearly.
         fu = frame_b[:self.y_offset, :self.overlap]
-        fd = frame_a[self.ht_b - self.y_offset:, self.x_offset:]
-        fm = self.fm * frame_a[:self.ht_a - self.y_offset, self.x_offset:] + (1 - self.fm) * frame_b[self.y_offset:, :self.overlap]
-        fm = np.concatenate((fu, fm, fd), axis=0)
+        if self.case_a:
+            fd = frame_a[self.ht_b - self.y_offset:, self.x_offset:]
+            fm = self.fm * frame_a[:self.ht_b - self.y_offset, self.x_offset:] + \
+                (1 - self.fm) * frame_b[self.y_offset:, :self.overlap]
+        else:
+            fd = frame_b[self.ht_a + self.y_offset:, :self.overlap]
+            fm = self.fm * frame_a[:, self.x_offset:] + \
+                (1 - self.fm) * frame_b[self.y_offset:self.ht_a + self.y_offset, :self.overlap]
         
         # Merge the left, middle, and right sections.
+        fm = np.concatenate((fu, fm.astype(self.dtype_u), fd), axis=0)
         frame_stitched = np.concatenate((fl, fm, fr), axis=1).astype(self.dtype_u)
+        
+        # Clear the stored frames.
+        fu, fd, fl, fr, fm = None, None, None, None, None
+        frame_a, frame_b = None, None
         if self.is_reversed:
             frame_stitched = frame_stitched[:, ::-1]
+        
         return frame_stitched
