@@ -98,7 +98,7 @@ class stitch_cpu:
     
     @property
     def frame_shape(self):
-        "Returns the shape of the stitched frames."
+        """Returns the shape of the stitched frames."""
         return self.cpu_stitch.frame_shape
 
 class StitchCPU:
