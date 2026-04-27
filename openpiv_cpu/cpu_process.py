@@ -1,4 +1,4 @@
-"""This module contains algorithms for PIV image analysis with a CPU."""
+"""This module contains algorithms for PIV analysis on a CPU."""
 
 import numpy as np
 from math import prod, ceil, log2, floor

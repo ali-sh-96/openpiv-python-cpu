@@ -1,9 +1,9 @@
 # OpenPIV-Python-CPU
-Algorithms for PIV image processing with a CPU.
+Algorithms for particle image velocimetry (PIV) on a CPU.
 
 [![DOI](https://zenodo.org/badge/670884759.svg)](https://zenodo.org/doi/10.5281/zenodo.8188114)
 
-[openpiv-python-cpu](https://github.com/ali-sh-96/openpiv-python-cpu) is a version of [openpiv-python](https://github.com/OpenPIV/openpiv-python) optimized for use with a central processing unit (CPU). OpenPIV-Python consists of Python modules for performing particle image velocimetry (PIV) analysis on a set of  image pairs. This implementation adds more flexibility for adjusting the PIV parameters. The cross-correlation is performed using the fastest Fourier transform in the west (pyFFTW), while the frame deformation is accelerated by Numba. Both validation and replacement procedures have been improved, and replacement through spring analogy has been added. Overall, this project aimed at improving the performance and accuracy for CPU-based PIV analysis.
+[openpiv-python-cpu](https://github.com/ali-sh-96/openpiv-python-cpu) is a version of [openpiv-python](https://github.com/OpenPIV/openpiv-python) optimized for use with a central processing unit (CPU). OpenPIV-Python consists of Python modules for performing PIV analysis on a set of  image pairs. This implementation adds more flexibility for adjusting the PIV parameters. The cross-correlation is performed using the fastest Fourier transform in the west (pyFFTW), while the frame deformation is accelerated by Numba. Both validation and replacement procedures have been improved, and replacement through spring analogy has been added. Overall, this project aimed at improving the performance and accuracy for CPU-based PIV analysis.
 
 ## Related projects
 An alternative implementation of the same algorithms for use with a graphics processing unit (GPU) is available as [openpiv-python-gpu](https://github.com/ali-sh-96/openpiv-python-gpu).
@@ -29,7 +29,7 @@ The OpenPIV documentation is readily accessible on the project's webpage at http
 1. [OpenPIV team](https://groups.google.com/forum/#!forum/openpiv-users)
 2. [Alex Liberzon](https://github.com/alexlib)
 3. [Ali Shirinzad](https://github.com/ali-sh-96)
-4. Pierre E. Sullivan
+4. [Pierre E. Sullivan](https://turbulence.mie.utoronto.ca/members/sullivan/)
 
 Copyright statement: `cpu_smoothn.py` is a Python version of `smoothn.m` originally created by
 [D. Garcia](https://de.mathworks.com/matlabcentral/fileexchange/25634-smoothn), written by Prof. Lewis, and available on
