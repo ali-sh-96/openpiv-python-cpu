@@ -7,8 +7,11 @@ Algorithms for particle image velocimetry (PIV) on a CPU.
 
 ## Related projects
 - [openpiv-python-gpu](https://github.com/ali-sh-96/openpiv-python-gpu)
+
 An alternative implementation of the same algorithms for use with a graphics processing unit (GPU).
+
 - [openptv-python-gpu](https://github.com/ali-sh-96/openptv-python-gpu)
+
 GPU-accelerated two-dimensional particle tracking velocimetry (PTV), based on a relaxation scheme.
 
 ## Warning
